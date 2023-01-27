@@ -4,9 +4,13 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    public float speed;
+    [SerializeField] private float speed;
+    [SerializeField] private float runSpeed;
 
     private Rigidbody2D rig;
+
+    private float initialSpeed;
+    private bool _isRunning;
     private Vector2 _direction;
 
     public Vector2 direction
@@ -15,16 +19,69 @@ public class Player : MonoBehaviour
         set { _direction = value; }
     }
 
-    private void Start() {
+    public bool isRunning
+    {
+        get { return _isRunning; }
+        set { _isRunning = value; }
+    }
+
+    private void Start() 
+    {
         rig = GetComponent<Rigidbody2D>();
+
+        initialSpeed = speed;
     }
 
     private void Update() 
     {
+        OnImput();
+
+        OnRun();
+    }
+
+    private void FixedUpdate() 
+    {
+        OnMove();
+    }
+
+    #region Movement
+
+    void OnImput()
+    {
         _direction = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
     }
 
-    private void FixedUpdate() {
+    void OnMove()
+    {
         rig.MovePosition(rig.position + _direction * speed * Time.fixedDeltaTime);
     }
+
+    void OnRun()
+    {
+        if(Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            speed = runSpeed;
+            isRunning = true;
+        }
+
+        if(Input.GetKeyUp(KeyCode.LeftShift))
+        {
+            speed = initialSpeed;
+            isRunning = false;
+        }
+
+        if(Input.GetKeyDown(KeyCode.RightShift))
+        {
+            speed = runSpeed;
+            isRunning = true;
+        }
+
+        if(Input.GetKeyUp(KeyCode.RightShift))
+        {
+            speed = initialSpeed;
+            isRunning = false;
+        }
+    }
+
+    #endregion
 }
